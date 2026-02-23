@@ -148,5 +148,5 @@ Its only goal is to model bag lifecycle and recycling as explicit domain states 
 Where this lives in the code:
 
 This behavior is modeled mainly in:
--BagStatus.
+- BagStatus.
 - Bag.

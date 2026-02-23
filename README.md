@@ -77,3 +77,76 @@ This behavior is modeled mainly in:
 - PickingWindowStatus.
 - PickingWindow.
 - Product.
+
+MINI-PROJECT 2: BAG QR RECYCLING (RESILIENT FLOW)
+
+Real-World problem:
+
+In real picking operations, bags can become unusable for many reasons: they can break, get wet, be the wrong size or be damaged during handling. When this happens, many systems either:
+- Interrupt picking flow.
+- Force manual workarounds outside the system.
+- Lose traceability of what happened.
+- Or penalize the operator for making the correct decision (discarding a bad bag).
+
+The core issue is that the system usually models this as an exception or tries to undo previous steps, instead of treating it as a normal and expected operational failure mode.
+
+What this model change introduces:
+
+This mini-project introduces an explicit operational status:
+- OPEN: the bag is ccurrently being filled.
+- CLOSED: the bag was successfully closed and is ready for downstream processing.
+- DISCARDED: the bag became unusable and must not be used anymore.
+- REUSED: a new bag was created as a replacement for a discarded one (compensation).
+
+Instead of trying to "rollback" the system, the model introduces a compensating action:
+- The current bag is marked as DISCARDED.
+- A new bag is created as a replacement.
+- The new bag keeps a reference to the discarded one for traceability.
+
+This makes the flow forward-only and explicit.
+
+Why this is a compensating, forward-only flow:
+
+In real systems, trying to revert the past usually creates more problems than it solves:
+- It breaks traceability.
+- It hides operational costs.
+- It creates inconsistent or hard-to-explain states.
+
+This model takes a different approach:
+- The past is not rewritten.
+- The failure is acknowledged by moving the bag to DISCARDED.
+- The system compensates by creating a new bag and continuing the flow.
+
+This keeps the system:
+- Honest about what happened.
+- Auditable.
+- And resilient to common operational failures.
+
+Trade-offs:
+
+Costs:
+- More bags can be consumed.
+- Additional metrics and controls may be needed to avoid abuse.
+
+Benefits:
+- The picking flow is not blocked by local failures.
+- Correct operational decisions are not penalized.
+- Traceability is preserved.
+- The system remains forward-only and explainable.
+- Operational failures become first-class states instead of hidden exceptions.
+
+Out of Scope:
+
+This mini-project does not address:
+- Bag capacity or physical constraints.
+- Picking area limits.
+- Orchestration or batch logic.
+- UI or operator workflows.
+
+Its only goal is to model bag lifecycle and recycling as explicit domain states and transitions.
+
+Where this lives in the code:
+
+This behavior is modeled mainly in:
+- BagStatus.
+- Bag.

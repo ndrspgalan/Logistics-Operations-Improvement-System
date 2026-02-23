@@ -1,12 +1,3 @@
-LOGISTICS OPERATIONS IMPROVEMENT SYSTEM
-
-This repository contains a set of design improvements applied to a logistics operations system. It is not a framework showcase nor an algorithmic demo. Its goal is to model real and recurring operational problems and to propose technical solutions with explicit and conscious trade-offs.
-The core premise is simple:
-
-In real systems, the problem is rarely "the code". The problem is usually and invalid system state caused by physical, temporal or operational constraints that the original model did not represent explicitly.
-
-Each mini-project introduces a local change to the domain model in order to make the system more honest, predictable, and explainable.
-
 MINI-PROJECT 1: TIME-AWARE PICKING WINDOW PLANNING
 
 Real-World Problem:

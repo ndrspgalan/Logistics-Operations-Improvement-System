@@ -7,7 +7,7 @@ In real systems, the problem is rarely "the code". The problem is usually and in
 
 Each mini-project introduces a local change to the domain model in order to make the system more honest, predictable, and explainable.
 
-MINI-PROYECT 1: TIME-AWARE PICKING WINDOW PLANNING
+MINI-PROJECT 1: TIME-AWARE PICKING WINDOW PLANNING
 
 Real-World Problem:
 
@@ -22,7 +22,7 @@ The original model did not explicitly represent temporal urgency nor the operati
 
 What this model change introduces:
 
-This mini-project introduces explicit time semantics into the domaing through operational window states:
+This mini-project introduces explicit time semantics into the domain through operational window states:
 - OPEN: >= 3 hours to deadline. Still open to new orders, not planned yet.
 - CONFIRMED: < 3 hours and >= 30 minutes. Closed to changes, can be planned and can be mixed.
 - URGENT: < 30 minutes. Can be picked, but must not be mixed with any other window.
@@ -35,11 +35,11 @@ This mini-project introduces explicit time semantics into the domaing through op
  Window mixing rules:
 
  Picking windows are allowed to be mixed according to explicit rules:
- - If either window is URGENT --> mixing is not allowed.
- - ONly windows in CONFIRMED state can be mixed.
+ - If either window is URGENT → mixing is not allowed.
+ - Only windows in CONFIRMED state can be mixed.
  - Mixing is only allowed if both windows share at least one product.
 
-This reflects a real operational constraint: mixing is acceptable only when there is real work overlap and no critial window is put at risk.
+This reflects a real operational constraint: mixing is acceptable only when there is real work overlap and no critical window is put at risk.
 
 Why the MISSING state exists:
 
@@ -47,7 +47,7 @@ MISSING does not represent "time". It represents and explicit operational failur
 - A window that reaches batch without being picked is not just "late": it requires manual intervention (staging, reprocessing, etc.).
 - A confirmed order cancellation implies a return or manual handling flow.
 
-Instead of hiding these cases behind generic errores or exceptions, the system models them as a domain state, maknig them visible, traceable and actionable.
+Instead of hiding these cases behind generic errors or exceptions, the system models them as a domain state, making them visible, traceable and actionable.
 
 Trade-offs:
 

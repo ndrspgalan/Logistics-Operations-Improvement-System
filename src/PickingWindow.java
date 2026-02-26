@@ -14,11 +14,14 @@ public class PickingWindow {
     private int maxCapacity;    // can be adjusted in real time
     private int usedCapacity;   // current assigned workload
 
-    public PickingWindow(String id, Instant deadline, Set<Product> products) {
+    public PickingWindow(String id, Instant deadline, Set<Product> products, int maxCapacity) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.deadline = Objects.requireNonNull(deadline, "deadline must not be null");
         this.products = Objects.requireNonNull(products, "products must not be null");
-        if (maxCapacity <= 0) throw new IllegalArgumentException("maxCapacity must be > 0");
+
+        if (maxCapacity <= 0) {
+            throw new IllegalArgumentException("maxCapacity must be > 0");
+        }
 
         this.maxCapacity = maxCapacity;
         this.usedCapacity = 0;

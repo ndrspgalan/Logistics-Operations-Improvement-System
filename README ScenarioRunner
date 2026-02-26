@@ -1,0 +1,186 @@
+## SCENARIO RUNNER — OPERATIONAL VALIDATION
+
+The "ScenarioRunner" is not a demo layer.
+It is a controlled simulation tool used to validate domain invariants, operational edge cases and scaling behavior.
+
+It executes two structured scenarios:
+
+- Scenario 1 — Known Operational Risks.
+- Scenario 2 — Scale x10 Stress Simulation.
+
+The runner revealed structural weaknesses and led to domain hardening decisions.
+
+---
+
+## Scenario 1 — Known Operational Risks
+
+This scenario validates real operational friction points.
+
+### 1. Late Cancellation on Confirmed Window
+
+When a cancellation occurs after a window is already in CONFIRMED or URGENT state:
+- The affected products are removed.
+- The window transitions to MISSING.
+- The system does not silently absorb the inconsistency.
+
+This models real-world operational behavior: confirmed workload cannot simply revert to OPEN without consequences.
+
+The transition to MISSING forces explicit downstream handling.
+
+---
+
+### 2. Capacity Overflow Protection
+
+Using "EffectiveCapacityPolicy", the runner simulates:
+- A valid small load -> accepted.
+- An oversized load -> rejected.
+
+Capacity rules are enforced before physical picking begins. This acts as a throughput guardrail and prevents:
+- Overweight bags.
+- Volume overflow in cardboard bags.
+- Unsafe cold-chain loads.
+
+Capacity is treated as a deterministic constraint layer, not as a planning afterthought.
+
+---
+
+## Scenario 2 — Scale x10 Simulation
+
+This scenario increases workload volume to observe structural behavior under stress.
+
+### Window Selection at Scale
+
+When dozen of windows are created:
+- Selection logic becomes a critical execution path.
+- All windows must be valid by construction (non-zero capacity).
+- The planner depends on invariant correctness.
+
+During simulation, improper initialization paths were exposed.
+Instead of isolating failures via try/catch in the runner,
+the domain model was hardened to enforce invariants at construction time.
+
+This ensures:
+- No invalid window can enter the planning layer.
+- Planning failures are not deferred to runtime caos.
+
+---
+
+### Expiration Matching at Scale
+
+Expiration matching performs a linear scan. At moderate scale this is acceptable.
+At larger scale, optimization strategies would include:
+- Pre-grouping by SKU.
+- Indexing by expiration date.
+- Maintaining structured inventory maps.
+
+Important: if no matching expiration-date bin exists,
+no automatic bin suggestion is returned.
+
+However, the BOH movement can still proceed manually.
+The system avoids suggesting mixed-expiration bins,
+but does not block reintroduction.
+
+This design reduces operational workarounds without artificially stopping inventory flow.
+
+---
+
+### Capacity Evaluation at Scale
+
+With increased product volume:
+- Capacity checks remain deterministic.
+- Large loads are correctly rejected.
+- Throughput pressure becomes visible.
+
+This confirms that packing constraints act as structural limits,
+not soft guidelines.
+
+---
+
+## Domain Hardening Triggered by Scenario Execution
+
+During Scenario execution, a structural weakness was identified:
+"PickingWindow" could be constructed without a properly enforced capacity invariant.
+
+Instead of solely introducing defensive wrappers in the runner (try/catch),
+the constructor was redesigned to:
+- Require "maxCapacity"" explicitly.
+- Validate it (> 0) at construction time.
+- Eliminate inconsistent initialization paths.
+
+This moved invariant enforcement to the correct architectural boundary.
+
+The runner exposed the issue.
+The domain model was corrected.
+No simulation-level defensive isolation was mandatory anymore.
+
+---
+
+## Architectural Ownership Boundaries
+
+The system intentionally separates responsibilities across domains.
+
+### Planning Domain
+
+Owns:
+- Window lifecycle (OPEN -> CONFIRMED -> URGENT -> MISSING).
+- Window selection logic.
+- Capacity initialization invariants.
+
+Does not own:
+- Expiration indexing.
+- Packing volume rules.
+- Reverse logistics policies.
+
+---
+
+### Inventory Domain
+
+Owns:
+- SKU-to-bin mapping.
+- Expiration-date integrity.
+- Prevention of mixed-expiration bin suggestions.
+
+Does not own:
+- Window planning decisions.
+- Capacity modeling.
+
+---
+
+### Packing & Capacity Domain
+
+Owns:
+- EffectiveCapacityPolicy.
+- BagType constraints.
+- Ice block compensation logic.
+- Fragile volume penalties.
+
+Does not own:
+- Window lifecycle transitions.
+- Inventory eligibility decisions.
+
+---
+
+### Reverse Logistics Domain
+
+Owns:
+- Returned bag parsing.
+- Eligibility for REINTRODUCE / DONATE / DESTROY.
+- Expiration threshold enforcement (< 7 days).
+- Double confirmation logic before execution.
+
+Does not own:
+- Planning horizon decisions.
+- Packing constraints.
+
+---
+
+## Architectural Outcome
+
+The ScenarioRunner demonstrates that:
+- Invariants are enforced at construction time.
+- Scaling reveals hot paths without hiding them.
+- Capacity rules act as structural safeguards.
+- Inventory matching avoids mixed-expiration automation without blocking flow.
+- Domain boundaries are explicit and intentional.
+
+This reflects production-oriented system thinking rather than demonstration code.

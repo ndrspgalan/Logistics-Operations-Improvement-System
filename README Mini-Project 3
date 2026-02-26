@@ -1,19 +1,23 @@
-MINI-PROJECT 3: EFFECTIVE BAG CAPACITY (PHYSICAL & OPERATIONAL MODEL)
+## MINI-PROJECT 3: EFFECTIVE BAG CAPACITY (PHYSICAL & OPERATIONAL MODEL)
 
-Real-World problem:
+### Real-World problem:
 
-Most systems treat bag capacity as purely theoretical number (volume or item count). In real operations, this leads to recurring issues:
+Most systems treat bag capacity as purely theoretical number (volume or item count).
+In real operations, this leads to recurring issues:
 - Cardboard bags break when weight is too high.
 - Cold orders require ice, which has a real physical cost (weight and space).
-- Some products (e. g., bottles, eggs, glass, yogurt, tomatoes) must be kept upright or protected, wasting effective space.
-- Oversized or heavy items (e. g., ham legs, mop sticks, charcoal) do not fit any standard bag and should not be treated as "normal packing".
+- Some products (e. g., bottles, eggs, glass, yogurt, tomatoes) must be kept upright or protected,
+wasting effective space.
+- Oversized or heavy items (e. g., ham legs, mop sticks, charcoal) do not fit any standard bag
+and should not be treated as "normal packing".
 - As a result, systems either overpack, trigger rework downstream or rely on manual judgment outside the system.
 
 The core problem is that the model uses theoretical capacity instead of effective, operational capacity.
 
-What this model change introduces:
+### What this model change introduces:
 
-This mini-project replaces "theoretical capacity" with an effective, conservative and operational capacity policy that reflects physical and safety constraints:
+This mini-project replaces "theoretical capacity" with an effective, conservative and operational capacity policy
+that reflects physical and safety constraints:
 - Different flows are modeled explicitly via BagType:
   - LIGHT_AMBIENT: cardboard bag, strict closing constraints.
   - HARD_AMBIENT: no bag at all (1 product = 1 unit, SLAM attached directly).
@@ -27,11 +31,12 @@ This mini-project replaces "theoretical capacity" with an effective, conservativ
  
 The result is a model that is boring, explicit, auditable and closer to reality.
 
-Bag types operational rules:
+### Bag types operational rules:
 
 HARD_AMBIENT (no bag)
 - Rule: only one product is allowed.
-- Rationale: oversized or heavy items (e. g., ham leg, mop stick, charcoal) receive the SLAM label directly on the product.
+- Rationale: oversized or heavy items (e. g., ham leg, mop stick, charcoal)
+receive the SLAM label directly on the product.
 - These items do not participate in any bag capacity calculation.
 
 LIGHT_AMBIENT (cardboard bag):
@@ -58,7 +63,8 @@ Ice amount depends on outside temperature:
   - CHILLED: 3-7 blocks.
   - FROZEN: 7-12 blocks.
    
-The system clamps the temperature to this range and computes the required number of blocks accordingly. This makes cold packing context-aware and predictable.
+The system clamps the temperature to this range and computes the required number of blocks accordingly.
+This makes cold packing context-aware and predictable.
 
 Fragile product (all areas):
 - The model uses a single flag: fragile.
@@ -68,7 +74,7 @@ Fragile product (all areas):
   - Allows downstream systems (e. g. SLAM/labels) to mark the bag as FRAGILE.
 - This applies to: LIGHT_AMBIENT, CHILLED, FROZEN; in HARD_AMBIENT there is no bag, but the flag is still relevant as a warning.
 
-Trade-offs:
+### Trade-offs:
 
 Costs:
 - Lower packing density in some scenarios.
@@ -82,7 +88,7 @@ Benefits:
 - More predictable and explainable behavior.
 - Capacity becomes an explicit policy instead of an implicit assumption.
 
-Out of Scope:
+### Out of Scope:
 
 This mini-project does not address:
 - Geometric packing optimization.
@@ -92,7 +98,7 @@ This mini-project does not address:
 
 Its only goal is to replace theoretical capacity with effective, operational capacity.
 
-Where this lives in the code:
+### Where this lives in the code:
 
 This behavior is modeled mainly in:
 - BagType.

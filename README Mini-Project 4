@@ -1,6 +1,6 @@
-MINI-PROJECT 4: UNPACK & EXPIRATION DATES (RETURN RECOVERY FLOW)
+## MINI-PROJECT 4: UNPACK & EXPIRATION DATES (RETURN RECOVERY FLOW)
 
-Real-World Problem
+### Real-World Problem:
 
 Returned orders (customer not present, refusal, etc.) introduce a highly error-prone flow in real operations:
 - Bags come back to the warehouse with mixed products and different expiration dates.
@@ -30,7 +30,7 @@ This eventually forces:
 
 In other words: the workaround is not free; it creates deferred operational debt.
 
-What this model change introduces:
+### What this model change introduces:
 
 This mini-project models a return recovery flow that is:
 - Explicit.
@@ -38,36 +38,43 @@ This mini-project models a return recovery flow that is:
 - Non-magical.
 - And designed to remove incentives for workarounds.
 
-Key changes:
+### Key changes:
+
 1. SLAM as a manifest:
   - When scanning the SLAM, the system presents the full list of items in the bag: SKU, quantity and expiration date.
   - The operator selects in one step which quantities to take out of the bag.
   - This removes redundant manual re-entry of data the system already knows.
-2. Explicit disposition per product: for each selected line, the operator chooses a destination. Noting is "implicitly discarded". Every outcome is an explicit decision.
+2. Explicit disposition per product: for each selected line, the operator chooses a destination.
+Noting is "implicitly discarded". Every outcome is an explicit decision.
   - REINTRODUCE --> move to UNPACK-AMBIENT-1 for later re-slotting.
   - DONATE --> move to the virtual DONATE stock.
   - DESTROY --> move to destruction flow.
-3. Hard guardrail for CHILLED / FROZEN: if the bag is CHILLED or FROZEN the only possible outcome is DESTROY. No other options are presented. No double confirmation is required.
+3. Hard guardrail for CHILLED / FROZEN: if the bag is CHILLED or FROZEN the only possible outcome is DESTROY.
+No other options are presented. No double confirmation is required.
   - Rationale: the cold chain is broken; these products are not recoverable for any other flow.
   - This is a system rule, not a human decision.
-4. Eligibility rules for REINTRODUCE (ambient flows only): this keeps unsafe stock out of circulation without blocking the flow. So, for LIGHT_AMBIENT and HARD_AMBIENT:
+4. Eligibility rules for REINTRODUCE (ambient flows only):
+this keeps unsafe stock out of circulation without blocking the flow. So, for LIGHT_AMBIENT and HARD_AMBIENT:
   - If a product has < 7 days to expiration:
     - REINTRODUCE is not allowed.
     - DONATE and DESTROY are still allowed.
   - If a product has >= 7 days:
     - REINTRODUCE, DONATE and DESTROY are all possible.
-5. Double confirmation for risky actions: this reduces costly mistakes while keeping the flow explicit and traceable. So, for LIGHT_AMBIENT / HARD_AMBIENT:
+5. Double confirmation for risky actions: this reduces costly mistakes while keeping the flow explicit and traceable.
+So, for LIGHT_AMBIENT / HARD_AMBIENT:
   - Confirmation 1: confirm the quantities selected to be taken out of the bag.
   - Confirmation 2: confirm the final disposition plan (REINTRODUCE / DONATE / DESTROY).
   - Only when all selected items are processed does the bag automatically move to the EMPTY state.
 
-Bin selection by expiration date (anti-workaround rule):
+### Bin selection by expiration date (anti-workaround rule):
 
 For items marked as REINTRODUCE, the system applies a strict matching rule:
 - Only bins with the SAME SKU and the SAME EXPIRATION DATE are considered eligible.
-- If no such bin exists, the system returns no suggestions adn surfaces the message "no products were found with equal expiration date".
+- If no such bin exists, the system returns no suggestions adn surfaces the message
+"no products were found with equal expiration date".
 
-Critical rule:
+### Critical rule:
+
 - Never suggest bins with a different expiration date.
 - Never push the operator to "fix" dates or use side tools as a workaround.
 - Make the cost explicit: if there is no match, there is no match.
@@ -78,7 +85,8 @@ This directly targets the root cause of:
 - Adjacent-bin pollution.
 - And the resulting inventory desynchronization.
 
-End-to-End flow summary:
+### End-to-End flow summary:
+
 1. Scan SLAM.
 2. If bag type is CHILLED / FROZEN:
     - System automatically sets all items to DESTROY.
@@ -95,12 +103,14 @@ End-to-End flow summary:
       - REINTRODUCE --> UNPACK-AMBIENT-1.
       - DONATE --> DONATE virtual stock.
       - DESTROY --> destruction flow.
-4. If no items remain, the bag transitions to EMPTY. This is a terminal lifecycle state that explicitly marks the bag as:
+4. If no items remain, the bag transitions to EMPTY.
+This is a terminal lifecycle state that explicitly marks the bag as:
   - Returned.
   - Fully unpacked.
-  - And cleanly closed from the operational flow, while still remaining available for traceability, auditing and reporting.
+  - And cleanly closed from the operational flow, while still remaining available for
+  traceability, auditing and reporting.
 
-Why the EMPTY state exists:
+### Why the EMPTY state exists:
 
 The model introduces an explicit EMPTY state to close the lifecycle of returned bags in a clean and auditable way.
 
@@ -115,7 +125,7 @@ Keeping this state explicit allows the system to:
 
 In other words, EMPTY is a terminal, traceable and intentional end state of the return recovery flow.
 
-Why this matters:
+### Why this matters:
 
 this model:
 - Uses the SLAM as a source of truth instead of re-asking humans for the same data.
@@ -124,9 +134,10 @@ this model:
 - Removes systemic incentives for workarounds.
 - Makes inventory inconsistencies less likely by design, instead of "fixed later" by audits.
 
-Most importantly: it treats return recovery not as an exception, but as a first-class operational flow with explicit rules and consequences.
+Most importantly: it treats return recovery not as an exception,
+but as a first-class operational flow with explicit rules and consequences.
 
-Trade-offs:
+### Trade-offs:
 
 costs:
 - Slightly more structured decision flow (confirmations).
@@ -139,7 +150,7 @@ Benefits:
 - Faster and more predictable operator flow.
 - Decisions are traceable, explainable and auditable.
 
-Out of Scope:
+### Out of Scope:
 
 This mini-project does not model:
 - UI / PDA screens.
@@ -149,7 +160,7 @@ This mini-project does not model:
 
 Its only goal is to model the decision rules and guardrails of the UNPACK + expiration-based disposition flow.
 
-Here this lives in the code:
+### Here this lives in the code:
 
 This behavior is modeled mainly in:
 - ReturnedBagManifest.

@@ -22,7 +22,7 @@ public class ReturnedBagManifest {
         return bagType;
     }
 
-    public List<RturnedItemLine> getLines() {
+    public List<ReturnedItemLine> getLines() {
         return lines;
     }
 }

@@ -5,9 +5,9 @@ Real-World problem:
 Most systems treat bag capacity as purely theoretical number (volume or item count). In real operations, this leads to recurring issues:
 - Cardboard bags break when weight is too high.
 - Cold orders require ice, which has a real physical cost (weight and space).
-- Some products (e. g., bottles, eggs, glass, yogurt, tomatoes) must be kepts upright or protected, wasting effective space.
+- Some products (e. g., bottles, eggs, glass, yogurt, tomatoes) must be kept upright or protected, wasting effective space.
 - Oversized or heavy items (e. g., ham legs, mop sticks, charcoal) do not fit any standard bag and should not be treated as "normal packing".
-- As a result, systems either overpack, trigger rework downstream or rely on manual jugdment outside the system.
+- As a result, systems either overpack, trigger rework downstream or rely on manual judgment outside the system.
 
 The core problem is that the model uses theoretical capacity instead of effective, operational capacity.
 
@@ -17,12 +17,12 @@ This mini-project replaces "theoretical capacity" with an effective, conservativ
 - Different flows are modeled explicitly via BagType:
   - LIGHT_AMBIENT: cardboard bag, strict closing constraints.
   - HARD_AMBIENT: no bag at all (1 product = 1 unit, SLAM attached directly).
-  - CHILLED / FROZZEN: special inner ice bag + flexible outer bag.
+  - CHILLED / FROZEN: special inner ice bag + flexible outer bag.
 - Capacity is validated by a policy (CapacityPolicy) instead of scattered checks.
 - The policy accounts for:
   - Weight limits (human handling safety).
   - Effective volume, not just theoretical volume.
-  - Fragile products, wich pack worse and require artificial volume penalties.
+  - Fragile products, which pack worse and require artificial volume penalties.
   - Ice blocks for cold bags, whose amount depends on outside temperature.
  
 The result is a model that is boring, explicit, auditable and closer to reality.
@@ -64,9 +64,9 @@ Fragile product (all areas):
 - The model uses a single flag: fragile.
 - If a product si fragile its volume is counted with a +20% artificial penalty.
 - This serves two purposes:
-  - For models worse packing efficency (upright, protected, spaced).
+  - For models worse packing efficiency (upright, protected, spaced).
   - Allows downstream systems (e. g. SLAM/labels) to mark the bag as FRAGILE.
-- This applies to: LIGHT_AMBIENT, CHILLED, FROZEN; in HARD_aMBIENT there is no bag, but the flag is still relevant as a warning.
+- This applies to: LIGHT_AMBIENT, CHILLED, FROZEN; in HARD_AMBIENT there is no bag, but the flag is still relevant as a warning.
 
 Trade-offs:
 

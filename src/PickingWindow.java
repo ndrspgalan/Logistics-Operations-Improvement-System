@@ -10,10 +10,18 @@ public class PickingWindow {
 
     private PickingWindowStatus status;
 
+    // New: dynamic capacity
+    private int maxCapacity;    // can be adjusted in real time
+    private int usedCapacity;   // current assigned workload
+
     public PickingWindow(String id, Instant deadline, Set<Product> products) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.deadline = Objects.requireNonNull(deadline, "deadline must not be null");
         this.products = Objects.requireNonNull(products, "products must not be null");
+        if (maxCapacity <= 0) throw new IllegalArgumentException("maxCapacity must be > 0");
+
+        this.maxCapacity = maxCapacity;
+        this.usedCapacity = 0;
         this.status = PickingWindowStatus.OPEN;
     }
 
@@ -31,6 +39,37 @@ public class PickingWindow {
 
     public PickingWindowStatus getStatus() {
         return status;
+    }
+
+    public int getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public int getUsedCapacity() {
+        return usedCapacity;
+    }
+
+    /**
+     * Capacity can change in real time due to staffing, incidents, etc.
+     */
+    public void updateMaxCapacity(int newMaxCapacity) {
+        if (newMaxCapacity <= 0) throw new IllegalArgumentException("newMaxCapacity must be > 0");
+        this.maxCapacity = newMaxCapacity;
+    }
+
+    public boolean hasFreeCapacity() {
+        return usedCapacity < maxCapacity;
+    }
+
+    /**
+     * A window can still accept new orders unless it is URGENT or MISSING,
+     * and only if it has free capacity.
+     */
+    public boolean canAcceptNewOrders() {
+        if (status == PickingWindowStatus.MISSING || status == PickingWindowStatus.URGENT) {
+            return false;
+        }
+        return hasFreeCapacity();
     }
 
     /**

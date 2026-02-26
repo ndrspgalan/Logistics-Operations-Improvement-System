@@ -3,16 +3,19 @@
  *
  * OPEN:
  * - >= 3 hours to deadline.
- * - Still open to new orders, not planned yet.
+ * - Still open to new orders.
+ * - Not yet committed to picking flow.
  *
  * CONFIRMED:
  * - < 3 hours and >= 30 minutes to deadline.
- * - Closed to changes, can be planned and can be mixed (if products overlap)
- * - Covers both "other" (~2h) and "now" (~1h).
+ * - Already committed to the picking flow.
+ * - Still MAY accept new orders IF capacity allows.
+ * - Can be mixed with other CONFIRMED windows (if products overlap and not URGENT).
  *
  * URGENT:
  * - < 30 minutes to deadline.
  * - Can be picked, but MUST NOT be mixed with any other window.
+ * - Still subject to capacity rules (no over-commit).
  *
  * MISSING:
  * - Operational failure state (not a time state).

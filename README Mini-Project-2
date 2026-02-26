@@ -13,7 +13,7 @@ The core issue is that the system usually models this as an exception or tries t
 What this model change introduces:
 
 This mini-project introduces an explicit operational status:
-- OPEN: the bag is ccurrently being filled.
+- OPEN: the bag is currently being filled.
 - CLOSED: the bag was successfully closed and is ready for downstream processing.
 - DISCARDED: the bag became unusable and must not be used anymore.
 - REUSED: a new bag was created as a replacement for a discarded one (compensation).

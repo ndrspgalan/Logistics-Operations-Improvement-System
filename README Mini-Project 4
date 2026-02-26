@@ -14,7 +14,7 @@ Returned orders (customer not present, refusal, etc.) introduce a highly error-p
 Worse, the current flow often pushes operators into workarounds when dealing with expiration dates and bin placement:
 - Changing expiration dates to "make the system accept the move".
 - Using cycle count tools as a patch.
-- Placing products in adjacents bin with different dates.
+- Placing products in adjacent bin with different dates.
 - Leaving products physically somewhere without proper virtual traceability.
 - Sending items to DONATE just to avoid friction.
 
@@ -43,25 +43,25 @@ Key changes:
   - When scanning the SLAM, the system presents the full list of items in the bag: SKU, quantity and expiration date.
   - The operator selects in one step which quantities to take out of the bag.
   - This removes redundant manual re-entry of data the system already knows.
-2. Explicit disposition per product: for each selected line, the operator chooses a destination. Noting is "implicity discarded". Every outcome is an explicit decision.
+2. Explicit disposition per product: for each selected line, the operator chooses a destination. Noting is "implicitly discarded". Every outcome is an explicit decision.
   - REINTRODUCE --> move to UNPACK-AMBIENT-1 for later re-slotting.
   - DONATE --> move to the virtual DONATE stock.
   - DESTROY --> move to destruction flow.
 3. Hard guardrail for CHILLED / FROZEN: if the bag is CHILLED or FROZEN the only possible outcome is DESTROY. No other options are presented. No double confirmation is required.
   - Rationale: the cold chain is broken; these products are not recoverable for any other flow.
   - This is a system rule, not a human decision.
-4. Eligibility rules for REINTRODUCE (ambient flows only): this keeps unsafe stock out of circulation without blocking the flow. So, for LIGHT_AMBIENT and HARD_aMBIENT:
+4. Eligibility rules for REINTRODUCE (ambient flows only): this keeps unsafe stock out of circulation without blocking the flow. So, for LIGHT_AMBIENT and HARD_AMBIENT:
   - If a product has < 7 days to expiration:
     - REINTRODUCE is not allowed.
     - DONATE and DESTROY are still allowed.
   - If a product has >= 7 days:
-    - REINTRODUCE, DONATE and DESTROY are all posible.
+    - REINTRODUCE, DONATE and DESTROY are all possible.
 5. Double confirmation for risky actions: this reduces costly mistakes while keeping the flow explicit and traceable. So, for LIGHT_AMBIENT / HARD_AMBIENT:
   - Confirmation 1: confirm the quantities selected to be taken out of the bag.
   - Confirmation 2: confirm the final disposition plan (REINTRODUCE / DONATE / DESTROY).
-  - Only when all selected items are proccessed does the bag automatically move to the EMPTY state.
+  - Only when all selected items are processed does the bag automatically move to the EMPTY state.
 
-Bin selection by expiratoin date (anti-workaround rule):
+Bin selection by expiration date (anti-workaround rule):
 
 For items marked as REINTRODUCE, the system applies a strict matching rule:
 - Only bins with the SAME SKU and the SAME EXPIRATION DATE are considered eligible.
@@ -83,7 +83,7 @@ End-to-End flow summary:
 2. If bag type is CHILLED / FROZEN:
     - System automatically sets all items to DESTROY.
     - Flow ends (no confirmations, no choices).
-3. If bag type is LIGHT_AMBIENT / HARD AMBIEENT:
+3. If bag type is LIGHT_AMBIENT / HARD AMBIENT:
     - System shows the full manifest (SKU, quantity, expiration):
     - Operator selects quantities to remove --> Confirmation 1.
     - Operator chooses disposition per line:
@@ -111,7 +111,7 @@ EMPTY is not the SAME as DISCARDED:
 Keeping this state explicit allows the system to:
 - Distinguish between "bag destroyed" and "bag successfully processed".
 - Support auditing and reporting of return flows.
-- Avoid ambigous terminal states where it is unclear wether a bag was lost, broken or properly unpacked.
+- Avoid ambiguous terminal states where it is unclear whether a bag was lost, broken or properly unpacked.
 
 In other words, EMPTY is a terminal, traceable and intentional end state of the return recovery flow.
 
@@ -133,7 +133,7 @@ costs:
 - More explicit rules to maintain.
 
 Benefits:
-- Fewer human errores.
+- Fewer human errors.
 - Less inventory desynchronization.
 - Less downstream audit and cycle-count pressure.
 - Faster and more predictable operator flow.
@@ -149,9 +149,9 @@ This mini-project does not model:
 
 Its only goal is to model the decision rules and guardrails of the UNPACK + expiration-based disposition flow.
 
-Ehere this lives in the code:
+Here this lives in the code:
 
-This behavior is modeleed mainly in:
+This behavior is modeled mainly in:
 - ReturnedBagManifest.
 - ReturnedItemLine.
 - Disposition.

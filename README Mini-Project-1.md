@@ -13,6 +13,11 @@ the system tends to optimize local throughput instead of real temporal urgency. 
 The original model did not explicitly represent temporal urgency nor the operational failures derived from
 time constraints.
 
+### Design Change
+
+Introduce explicit time semantics into the picking window domain model,
+turning temporal urgency into a first-class operational state.
+
 ### What this model change introduces:
 
 This mini-project introduces explicit time semantics into the domain through operational window states:

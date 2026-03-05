@@ -65,11 +65,23 @@ close to the domain where they belong.
 
 ## Introduction
 
-This repository contains a set of design improvements applied to a logistics operations system.
-It is not a framework showcase nor an algorithmic demo.
-Its goal is to model real and recurring operational problems and to propose technical solutions
-with explicit and conscious trade-offs.
-The core premise is simple:
+Operational software frequently fails not because the algorithms are incorrect,
+but because the system model ignores physical, temporal or operational constraints.
+
+When these constraints are not represented explicitly, the system gradually drifts away from real-world behavior. Operators compensate with manual workarounds, side tools or informal practices that the system cannot observe or explain.
+
+This repository explores how small and deliberate changes in the domain model can reduce these gaps.
+
+Each mini-project introduces a focused design change addressing a recurring operational friction point in logistics systems:
+- Time-aware planning for picking windows.
+- Resilient bag lifecycle handling.
+- Effective physical capacity modeling.
+- Guard-railed return recovery flows.
+
+The goal is not to build a framework or demonstrate algorithms,
+but to model operational reality more faithfully and make system behavior more predictable, explainabale and auditable.
+
+Each change intentionally introduces explicit trade-offs between local efficency and systemic reliability.
 
 ## System Philosophy
 
@@ -77,8 +89,14 @@ In real systems, the problem is rarely "the code".
 The problem is usually and invalid system state caused by physical, temporal or operational constraints
 that the original model did not represent explicitly.
 
-Each mini-project introduces a local change to the domain model in order to make
-the system more honest, predictable, and explainable.
+This repository explores a different approach:
+- Make operational constraints explicit in the domain model.
+- Represent operational faiures as domain states instead of exceptions.
+- Prefer forward-only compensating flows instead of rollback logic.
+- Accept local ineffiency in exchange for global predictability.
+
+The goal is not to optimize local throughput,
+but to prevent invalid operational states from entering the system.
 
 ## Domain invariants
 

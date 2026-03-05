@@ -62,6 +62,7 @@ ChooseDisposition --> Confirm2[Confirmation 2]
 Confirm2 --> ExecuteMoves[Execute Inventory Moves]
 
 ExecuteMoves --> BagEmpty[Bag becomes EMPTY]
+```
 
 ### Key changes:
 

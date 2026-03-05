@@ -29,6 +29,17 @@ This makes the flow forward-only and explicit.
 
 ### Bag Lifecycle
 
+```mermaid
+stateDiagram-v2
+
+OPEN --> CLOSED : normal completion
+
+OPEN --> DISCARDED : bag failure
+DISCARDED --> REUSED : replacement bag created
+
+CLOSED --> EMPTY : unpack completed
+```
+
 ### Why this is a compensating, forward-only flow:
 
 In real systems, trying to revert the past usually creates more problems than it solves:

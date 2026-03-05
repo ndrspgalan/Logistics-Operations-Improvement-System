@@ -14,15 +14,15 @@ flowchart LR
 
 Orders[Customer Orders]
 
-Planning[Planning Domain\nPicking Windows]
+Planning["Planning Domain<br/>Picking Windows"]
 
-Packing[Packing Domain\nCapacity Policy]
+Packing["Packing Domain<br/>Capacity Policy"]
 
 Picking[Picking Execution]
 
-Returns[Reverse Logistics\nUnpack Flow]
+Returns["Reverse Logistics<br/>Unpack Flow"]
 
-Inventory[Inventory Domain\nBin Stock]
+Inventory["Inventory Domain<br/>Bin Stock"]
 
 Orders --> Planning
 Planning --> Picking
@@ -33,6 +33,7 @@ Picking --> Returns
 Returns --> Inventory
 
 Inventory --> Planning
+```
 
 ### Domain Interaction Overview
 

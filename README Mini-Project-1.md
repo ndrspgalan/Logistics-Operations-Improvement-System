@@ -37,6 +37,7 @@ URGENT --> MISSING : deadline passed
 
 CONFIRMED --> MISSING : late cancellation
 URGENCY --> MISSING : operational failure
+```
 
 ### Capacity and Order Admission:
 

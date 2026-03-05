@@ -14,6 +14,24 @@ and should not be treated as "normal packing".
 
 The core problem is that the model uses theoretical capacity instead of effective, operational capacity.
 
+### Design Change
+
+Replace theoretical bag capacity with an explicit operational capacity policy.
+
+Instead of assuming that all items pack perfectly according to their theoretical volume, the system introduces a deterministic capacity policy that reflects real packing constraints.
+
+Capacity validation now accounts for:
+- Weight limits related to safe manual handling.
+- Effective packing volume rather than theoretical volume.
+- Fragile items that require additional space.
+- Ice blocks required for cold chains.
+- Operational differences between bag types.
+
+The capacity policy becomes a dedicated domain component rather than scattered validation logic.
+This makes packing constraints explicit, predictable, auditable and consistent across the system.
+
+The model intentionally favors conservative capacity decisions in order to reduce downstream operational failures.
+
 ### What this model change introduces:
 
 This mini-project replaces "theoretical capacity" with an effective, conservative and operational capacity policy

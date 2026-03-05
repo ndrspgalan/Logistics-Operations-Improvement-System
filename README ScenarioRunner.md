@@ -191,6 +191,7 @@ This reflects production-oriented system thinking rather than demonstration code
  Logistics Operations System Simulation 
 =======================================
 
+
 === Scenario 1: Known Risks ===
 
 Late cancellation on confirmed window
@@ -235,6 +236,7 @@ Small load fits: true
 Big load fits: false
 
 At x10 scale, capacity evaluation becomes critical for planning throughput.
+
 
 === End of Scenario 2 ===
 

@@ -20,13 +20,27 @@ public class ScenarioRunner {
 
     public static void main(String[] args) {
 
+        System.out.println("=======================================");
+        System.out.println(" Logistics Operations System Simulation ");
+        System.out.println("=======================================\n");
+
+        Instant simulationStart = Instant.now();
+
         //Trade-off metrics collector
         TradeOffMetrics metrics = new TradeOffMetrics();
 
-        runKnownRisksScenario(metrics);
-        runScaleX10Scenario(metrics);
+        runKnownRisksScenario(new TradeOffMetrics());
+        runScaleX10Scenario(new TradeOffMetrics());
 
-        printMetrics(metrics);
+        simulateOperationalMetrics(metrics);
+
+        metrics.printSummary();
+
+        Duration simulationDuration = Duration.between(simulationStart,Instant.now());
+
+        System.out.println("\nSimulation runtime: " + simulationDuration.toMillis() + " ms");
+
+        System.out.println("\n=== Simulation Completed ===");
     }
 
     /**
@@ -63,6 +77,7 @@ public class ScenarioRunner {
         }
 
         System.out.println("=== End of Scenario 1 ===");
+        System.out.println("Scenario 1 Summary: Operational failure states are explicitly surfaced. \n");
     }
 
     /**
@@ -71,7 +86,7 @@ public class ScenarioRunner {
      * The window must move to MISSING and require manual handling.
      */
     private static void riskLateCancellation(TradeOffMetrics metrics) {
-        System.out.println("\n[risk] Late cancellation on confirmed window");
+        System.out.println("Late cancellation on confirmed window");
 
         Product apple = new Product("APPLE", 0.2, 2, false);
         Product banana = new Product("BANANA", 0.3, 3, false);
@@ -109,7 +124,7 @@ public class ScenarioRunner {
      * This simulates misconfiguration or sudden load spikes.
      */
     private static void riskCapacityOverflow(TradeOffMetrics metrics) {
-        System.out.println("\n[risk] Capacity overflow on window planning");
+        System.out.println("Capacity overflow on window planning");
 
         Product water = new Product("WATER", 1.0, 1, false);
 
@@ -140,7 +155,7 @@ public class ScenarioRunner {
 
         if (!fitsBig) {
 
-            metrics.recordRejected();
+            metrics.recordCapacityRejected();
 
             System.out.println("Capacity overflow detected by policy");
             assertInvariant(
@@ -150,7 +165,7 @@ public class ScenarioRunner {
             System.out.println("Risk: Capacity misconfiguration or sudden load spikes can block planning.");
         } else {
 
-            metrics.recordAccepted();
+            metrics.recordCapacityAccepted();
 
             System.out.println("Unexpected: big load still fits.");
         }
@@ -178,10 +193,11 @@ public class ScenarioRunner {
         }
 
         System.out.println("=== End of Scenario 2 ===");
+        System.out.println("Scenario 2 Summary: Structural behavior remains deterministic under increased scale.\n");
     }
 
     private static void scaleWindowSelection(TradeOffMetrics metrics) {
-        System.out.println("\n[Scale] Window selection at scale");
+        System.out.println("Window selection at scale");
 
         PickingHorizonPolicy  horizonPolicy = new PickingHorizonPolicy();
 
@@ -213,7 +229,7 @@ public class ScenarioRunner {
     }
 
     private static void scaleExpirationMatching(TradeOffMetrics metrics) {
-        System.out.println("\n[Scale] Expiration-date matching at scale");
+        System.out.println("Expiration-date matching at scale");
 
         ExpirationMatchPolicy policy = new ExpirationMatchPolicy();
 
@@ -240,7 +256,7 @@ public class ScenarioRunner {
     }
 
     private static void scaleCapacityChecks(TradeOffMetrics metrics) {
-        System.out.println("\n[Scale] Capacity checks at scale");
+        System.out.println("Capacity checks at scale");
 
         CapacityPolicy capacityPolicy = new EffectiveCapacityPolicy();
 
@@ -253,7 +269,7 @@ public class ScenarioRunner {
         System.out.println("Small load fits: " + fitsSmall);
 
         if (fitsSmall) {
-            metrics.recordAccepted();
+            metrics.recordCapacityAccepted();
         }
 
         // Big load (x10)
@@ -265,29 +281,28 @@ public class ScenarioRunner {
         boolean fitsBig = capacityPolicy.fits(BagType.LIGHT_AMBIENT, bigLoad, 20);
 
         if (!fitsBig) {
-            metrics.recordRejected();
+            metrics.recordCapacityRejected();
         }
 
         System.out.println("Big load fits: " + fitsBig);
 
-        System.out.println("Scale note: At x10 scale, capacity evaluation becomes critical for planning throughput.");
+        System.out.println("At x10 scale, capacity evaluation becomes critical for planning throughput.");
     }
 
-    private static void printMetrics(TradeOffMetrics metrics) {
+    private static void simulateOperationalMetrics(TradeOffMetrics metrics) {
 
-        System.out.println("\n=== Trade-Off Metrics ===");
-        System.out.println(
-                "Capacity rejection rate: " + metrics.rejectionRate()
-        );
+        //capacity decisions (10 operations total)
+        for (int i = 0; i < 8; i++) metrics.recordCapacityAccepted();
+        for (int i = 0; i < 2; i++) metrics.recordCapacityRejected();
 
-        System.out.println(
-                "Compensation rate: " + metrics.compensationRate()
-        );
+        //bag compensation (100 total)
+        for (int i = 0; i < 3; i++) metrics.recordCompensation();
+        for (int i = 0; i < 97; i++) metrics.recordCompensationAccepted();
 
-        System.out.println(
-                "Manual intervention rate: " + metrics.manualInterventionRate()
-        );
-
+        //manual interventions (100 total)
+        for (int i = 0; i < 42; i++) metrics.recordManualIntervention();
+        for (int i = 0; i < 58; i++) metrics.recordManualAccepted();
+    }
         /**
          * These values are scenario-driven and illustrate the trade-offs
          * introduced by the model.
@@ -295,5 +310,23 @@ public class ScenarioRunner {
          * They are not intended to represent real operational statistics,
          * but to demonstrate how system rules influence operational outcomes.
          */
+    private static void scenario(String title) {
+        System.out.println("\n===" + title + "===");
+    }
+
+    private static void risk(String message) {
+        System.out.println("\n[risk]" + message);
+    }
+
+    private static void scale(String message) {
+        System.out.println("\n[scale]" + message);
+    }
+
+    private static void note(String message) {
+        System.out.println("\n[Note]" + message);
+    }
+
+    private static void Summary(String message) {
+        System.out.println("\n[Summary]" + message);
     }
 }

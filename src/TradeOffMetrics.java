@@ -1,72 +1,111 @@
 public class TradeOffMetrics {
 
-    //Number of successful operations
-    private int operationsAccepted;
+    // --- Capacity metrics ---
+    private int capacityAccepted;
+    private int capacityRejected;
 
-    //Number of operations rejected due to safety or domain constraints
-    private int operationsRejected;
-
-    //Number of compensating actions triggered
+    // --- Compensation metrics ---
+    private int compensationAccepted;
     private int compensationsTriggered;
 
-    //Number of manual decisions required from the operator
+    // --- Manual intervention metrics ---
+    private int manualAccepted;
     private int manualInterventions;
 
-    //Record a successful operation
-    public void recordAccepted() {
-        operationsAccepted++;
+    // ------ Record operations -------
+
+    public void recordCapacityAccepted() {
+        capacityAccepted++;
     }
 
-    //Record a rejected operation
-    public void recordRejected() {
-        operationsRejected++;
+    public void recordCapacityRejected() {
+        capacityRejected++;
     }
 
-    //Record a compensating action
+    public void recordCompensationAccepted() {
+        compensationAccepted++;
+    }
+
     public void recordCompensation() {
         compensationsTriggered++;
     }
 
-    //Record a manual decision
+    public void recordManualAccepted() {
+        manualAccepted++;
+    }
+
     public void recordManualIntervention() {
         manualInterventions++;
     }
 
+    // ------ Metric calculations ------
+
     //Percentage of rejected operations
     public double rejectionRate() {
 
-        int total = operationsAccepted + operationsRejected;
+        int total = capacityAccepted + capacityRejected;
 
         if (total == 0) {
             return 0.0;
         }
 
-        return (double) compensationsTriggered / total;
+        return round((double) capacityRejected / total);
     }
 
     //Percentage of compensating actions
     public double compensationRate() {
 
-        int total = operationsAccepted + compensationsTriggered;
+        int total = compensationAccepted + compensationsTriggered;
 
         if(total == 0) {
             return 0.0;
         }
 
-        return (double) compensationsTriggered / total;
+        return round((double) compensationsTriggered / total);
     }
 
 
     //Manual intervention intensity
     public double manualInterventionRate() {
 
-        int total = operationsAccepted + manualInterventions;
+        int total = manualAccepted + manualInterventions;
 
         if (total == 0) {
             return 0.0;
         }
 
-        return (double) manualInterventions / total;
+        return round((double) manualInterventions / total);
+    }
+
+    // ------ Helper ------
+
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+    // ------ Output ------
+
+    public void printSummary() {
+
+        System.out.println("\n=== Trade-Off Metrics ===");
+
+        System.out.println(
+                "Capacity rejection rate: "
+                        + rejectionRate()
+                        + " (" + capacityRejected + "/" + (capacityAccepted + capacityRejected) + ")"
+        );
+
+        System.out.println(
+                "Compensation rate: "
+                        + compensationRate()
+                        + " (" + compensationsTriggered + "/" + (compensationAccepted + compensationsTriggered) + ")"
+        );
+
+        System.out.println(
+                "Manual intervention rate: "
+                        + manualInterventionRate()
+                        + " (" + manualInterventions + "/" + (manualAccepted + manualInterventions) + ")"
+        );
     }
 }
 

@@ -184,3 +184,48 @@ The ScenarioRunner demonstrates that:
 - Domain boundaries are explicit and intentional.
 
 This reflects production-oriented system thinking rather than demonstration code.
+
+## Example Scenario Output
+
+=======================================
+ Logistics Operations System Simulation 
+=======================================
+
+=== Scenario 1: Known Risks ===
+Late cancellation on confirmed window
+Initial status: CONFIRMED
+Status after cancellation: MISSING
+Risk: Late cancellations create operational exceptions that require manual workflows.
+Capacity overflow on window planning
+Small load fits: true
+Capacity overflow detected by policy
+Risk: Capacity misconfiguration or sudden load spikes can block planning.
+=== End of Scenario 1 ===
+Scenario 1 Summary: Operational failure states are explicitly surfaced. 
+
+
+=== Scenario 2: Scale X 10 ===
+Window selection at scale
+Scenario 2.1 failed with exception: newMaxCapacity must be > 0
+Expiration-date matching at scale
+Total bins scanned: 100
+Matching bins found: 6
+Scale note: At x10 scale, this O(n) scan should be optimized by grouping by SKU+date.
+Capacity checks at scale
+Small load fits: true
+Big load fits: false
+At x10 scale, capacity evaluation becomes critical for planning throughput.
+=== End of Scenario 2 ===
+Scenario 2 Summary: Structural behavior remains deterministic under increased scale.
+
+
+=== Trade-Off Metrics ===
+Capacity rejection rate: 0.2 (2/10)
+Compensation rate: 0.03 (3/100)
+Manual intervention rate: 0.42 (42/100)
+
+Simulation runtime: 28 ms
+
+=== Simulation Completed ===
+
+Process finished with exit code 0

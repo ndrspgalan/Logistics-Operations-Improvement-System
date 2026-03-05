@@ -12,6 +12,20 @@ they can break, get wet, be the wrong size or be damaged during handling. When t
 The core issue is that the system usually models this as an exception or tries to undo previous steps,
 instead of treating it as a normal and expected operational failure mode.
 
+### Design Change
+
+Introduce an explicit bag lifecycle with a forward-only compensating flow.
+
+Instead of treating bag failures as exceptions or attempting to revert previous operations,
+the system models them as normal and expected operational events.
+
+When a bag becomes unusable, the domain transitions it to the "DISCARDED" state and creates a replacement bag linked to the original one.
+
+This makes the flow forward-only,traceable and reslient to local failures.
+
+The past is not rewritten. The system acknoledges the failure and compensates explicitly,
+preserving operational continuity and auditability.
+
 ### What this model change introduces:
 
 This mini-project introduces an explicit operational status:

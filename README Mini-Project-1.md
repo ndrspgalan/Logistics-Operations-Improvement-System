@@ -35,8 +35,7 @@ OPEN --> CONFIRMED : < 3h to deadline
 CONFIRMED --> URGENT : < 30m to deadline
 URGENT --> MISSING : deadline passed
 
-CONFIRMED --> MISSING : late cancellation
-URGENCY --> MISSING : operational failure
+CONFIRMED --> MISSING : late cancellation or operational failure (workaround required)
 ```
 
 ### Capacity and Order Admission:

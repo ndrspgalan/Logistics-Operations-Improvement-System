@@ -5,24 +5,59 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The ScenarioRunner also acts as a small operational simulator.
+ *
+ * It allows the model to surface trade-offs such as:
+ * - Rejected loads.
+ * - Compensating actions.
+ * - Manual interventions.
+ *
+ * Metrics are scenario-driven rather than statistically modeled.
+ */
+
 public class ScenarioRunner {
 
     public static void main(String[] args) {
-        runKnownRisksScenario();
-        runScaleX10Scenario();
+
+        //Trade-off metrics collector
+        TradeOffMetrics metrics = new TradeOffMetrics();
+
+        runKnownRisksScenario(metrics);
+        runScaleX10Scenario(metrics);
+
+        printMetrics(metrics);
     }
 
-    private static void runKnownRisksScenario() {
+    /**
+     * Domain invariant validation helper.
+     *
+     * ScenarioRunner is not a unit-test suite.
+     * Instead, it validates that important operational
+     * invariants remain true under simulated scenarios.
+     *
+     * If an invariant fails, the scenario is considered invalid.
+     */
+    private static void assertInvariant(boolean condition, String message) {
+
+        if (!condition) {
+            throw new IllegalStateException(
+                    "Invariant violated: " + message
+            );
+        }
+    }
+
+    private static void runKnownRisksScenario(TradeOffMetrics metrics) {
         System.out.println("=== Scenario 1: Known Risks ===");
 
         try {
-            riskLateCancellation();
+            riskLateCancellation(metrics);
         } catch (Exception e) {
             System.out.println("Scenario 1.1 failed with exception: " + e.getMessage());
         }
 
         try {
-            riskCapacityOverflow();
+            riskCapacityOverflow(metrics);
         } catch (Exception e) {
             System.out.println("Scenario 1.2 failed with exception: " + e.getMessage());
         }
@@ -35,7 +70,7 @@ public class ScenarioRunner {
      * A late cancellation happens on a confirmed window.
      * The window must move to MISSING and require manual handling.
      */
-    private static void riskLateCancellation() {
+    private static void riskLateCancellation(TradeOffMetrics metrics) {
         System.out.println("\n[risk] Late cancellation on confirmed window");
 
         Product apple = new Product("APPLE", 0.2, 2, false);
@@ -60,6 +95,12 @@ public class ScenarioRunner {
         window.cancelConfirmedOrder(Set.of(apple));
 
         System.out.println("Status after cancellation: " + window.getStatus());
+
+        assertInvariant(
+                window.getStatus() == PickingWindowStatus.MISSING,
+                "Confirmed window cancellation must transition to MISSING"
+        );
+
         System.out.println("Risk: Late cancellations create operational exceptions that require manual workflows.");
     }
 
@@ -67,7 +108,7 @@ public class ScenarioRunner {
      * Capacity policy rejects a load that does not fit.
      * This simulates misconfiguration or sudden load spikes.
      */
-    private static void riskCapacityOverflow() {
+    private static void riskCapacityOverflow(TradeOffMetrics metrics) {
         System.out.println("\n[risk] Capacity overflow on window planning");
 
         Product water = new Product("WATER", 1.0, 1, false);
@@ -98,30 +139,40 @@ public class ScenarioRunner {
         );
 
         if (!fitsBig) {
+
+            metrics.recordRejected();
+
             System.out.println("Capacity overflow detected by policy");
+            assertInvariant(
+                    !fitsBig,
+                    "Oversized load must be rejected by capacity policy"
+            );
             System.out.println("Risk: Capacity misconfiguration or sudden load spikes can block planning.");
         } else {
+
+            metrics.recordAccepted();
+
             System.out.println("Unexpected: big load still fits.");
         }
     }
 
-    private static void runScaleX10Scenario() {
+    private static void runScaleX10Scenario(TradeOffMetrics metrics) {
         System.out.println("\n=== Scenario 2: Scale X 10 ===");
 
         try {
-            scaleWindowSelection();
+            scaleWindowSelection(metrics);
         } catch (Exception e) {
             System.out.println("Scenario 2.1 failed with exception: " + e.getMessage());
         }
 
         try {
-            scaleExpirationMatching();
+            scaleExpirationMatching(metrics);
         } catch (Exception e) {
             System.out.println("Scenario 2.2 failed with exception: " + e.getMessage());
         }
 
         try {
-            scaleCapacityChecks();
+            scaleCapacityChecks(metrics);
         } catch (Exception e) {
             System.out.println("Scenario 2.3 failed with exception: " + e.getMessage());
         }
@@ -129,7 +180,7 @@ public class ScenarioRunner {
         System.out.println("=== End of Scenario 2 ===");
     }
 
-    private static void scaleWindowSelection() {
+    private static void scaleWindowSelection(TradeOffMetrics metrics) {
         System.out.println("\n[Scale] Window selection at scale");
 
         PickingHorizonPolicy  horizonPolicy = new PickingHorizonPolicy();
@@ -161,7 +212,7 @@ public class ScenarioRunner {
         System.out.println("Scale note: At x10 scale, window selection becomes a hot path and should be indexed / pre-sorted.");
     }
 
-    private static void scaleExpirationMatching() {
+    private static void scaleExpirationMatching(TradeOffMetrics metrics) {
         System.out.println("\n[Scale] Expiration-date matching at scale");
 
         ExpirationMatchPolicy policy = new ExpirationMatchPolicy();
@@ -181,10 +232,14 @@ public class ScenarioRunner {
 
         System.out.println("Total bins scanned: " + allBins.size());
         System.out.println("Matching bins found: " + matches.size());
+        assertInvariant(
+                matches.stream().allMatch(b -> b.getExpirationDate().equals(targetDate)),
+                "Expiration matching must not suggest bins with different expiration dates"
+        );
         System.out.println("Scale note: At x10 scale, this O(n) scan should be optimized by grouping by SKU+date.");
     }
 
-    private static void scaleCapacityChecks() {
+    private static void scaleCapacityChecks(TradeOffMetrics metrics) {
         System.out.println("\n[Scale] Capacity checks at scale");
 
         CapacityPolicy capacityPolicy = new EffectiveCapacityPolicy();
@@ -197,6 +252,10 @@ public class ScenarioRunner {
         boolean fitsSmall = capacityPolicy.fits(BagType.LIGHT_AMBIENT, smallLoad, 20);
         System.out.println("Small load fits: " + fitsSmall);
 
+        if (fitsSmall) {
+            metrics.recordAccepted();
+        }
+
         // Big load (x10)
         List<Product> bigLoad = new java.util.ArrayList<>();
         for (int i = 0; i < 30; i++) {
@@ -204,8 +263,37 @@ public class ScenarioRunner {
         }
 
         boolean fitsBig = capacityPolicy.fits(BagType.LIGHT_AMBIENT, bigLoad, 20);
+
+        if (!fitsBig) {
+            metrics.recordRejected();
+        }
+
         System.out.println("Big load fits: " + fitsBig);
 
         System.out.println("Scale note: At x10 scale, capacity evaluation becomes critical for planning throughput.");
+    }
+
+    private static void printMetrics(TradeOffMetrics metrics) {
+
+        System.out.println("\n=== Trade-Off Metrics ===");
+        System.out.println(
+                "Capacity rejection rate: " + metrics.rejectionRate()
+        );
+
+        System.out.println(
+                "Compensation rate: " + metrics.compensationRate()
+        );
+
+        System.out.println(
+                "Manual intervention rate: " + metrics.manualInterventionRate()
+        );
+
+        /**
+         * These values are scenario-driven and illustrate the trade-offs
+         * introduced by the model.
+         *
+         * They are not intended to represent real operational statistics,
+         * but to demonstrate how system rules influence operational outcomes.
+         */
     }
 }

@@ -76,8 +76,22 @@ public class UnpackService {
     * Confirm plan (Confirmation 2) and execute it.
      */
     public ExecutionResult confirmAndExecute(DispositionPlan plan) {
+
+        /**
+         * Idempotency guard.
+         *
+         * Execution may be retried if the worker crashes or
+         * the message is redelivered.
+         *
+         * If the plan is already confirmed, we simply return
+         * the same logical outcome instead of throwing an exception.
+         */
         if (plan.getConfirmationStatus() == ConfirmationStatus.CONFIRMED) {
-            throw new IllegalStateException("Plan already confirmed");
+
+            return new ExecutionResult(
+                    List.of(),
+                    true
+            );
         }
 
         plan.confirm();

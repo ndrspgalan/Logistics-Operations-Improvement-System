@@ -26,6 +26,18 @@ Still may accept new orders if capacity allows.
 
 Time is no longer just a date comparison; it becomes part of the domain state.
 
+### Picking Window Lifecycle
+
+```mermaid
+stateDiagram-v2
+
+OPEN --> CONFIRMED : < 3h to deadline
+CONFIRMED --> URGENT : < 30m to deadline
+URGENT --> MISSING : deadline passed
+
+CONFIRMED --> MISSING : late cancellation
+URGENCY --> MISSING : operational failure
+
 ### Capacity and Order Admission:
 
 Each picking window has a dynamic production capacity:

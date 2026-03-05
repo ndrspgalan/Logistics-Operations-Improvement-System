@@ -38,6 +38,31 @@ This mini-project models a return recovery flow that is:
 - Non-magical.
 - And designed to remove incentives for workarounds.
 
+### Return Processing Flow
+
+```mermaid
+flowchart TD
+
+ScanSLAM[Scan SLAM]
+
+ScanSLAM --> BagType{Bag Type}
+
+BagType -->|Chilled/Frozen| DestroyAll[Automatic Destroy]
+
+BagType -->|Ambient| ShowManifest[Show Manifest]
+
+ShowManifest --> SelectQty[Select Quantities]
+
+SelectQty --> Confirm1[Confirmation 1]
+
+Confirm1 --> ChooseDisposition[Choose Disposition]
+
+ChooseDisposition --> Confirm2[Confirmation 2]
+
+Confirm2 --> ExecuteMoves[Execute Inventory Moves]
+
+ExecuteMoves --> BagEmpty[Bag becomes EMPTY]
+
 ### Key changes:
 
 1. SLAM as a manifest:

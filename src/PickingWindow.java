@@ -147,7 +147,23 @@ public class PickingWindow {
      * We model this by marking the window as MISSING.
      */
     public void cancelConfirmedOrder(Set<Product> cancelledProducts) {
-        if (this.status == PickingWindowStatus.CONFIRMED || this.status == PickingWindowStatus.URGENT) {
+
+        /**
+         * Idempotency guard.
+         *
+         * Cancellation events may be delivered more than once
+         * in distributed system or retry scenarios.
+         *
+         * If the window is already marked as MISSING,
+         * the operation has already been processed.
+         */
+        if (this.status == PickingWindowStatus.MISSING) {
+            return;
+        }
+
+        if (this.status == PickingWindowStatus.CONFIRMED
+                || this.status == PickingWindowStatus.URGENT) {
+
             this.products.removeAll(cancelledProducts);
             this.status = PickingWindowStatus.MISSING;
         }

@@ -52,18 +52,28 @@ public class Bag {
      * - The new bag keeps a reference to the discarded one for traceability.
      */
      public Bag discardAndRequestNewBag() {
+
+
+         /**
+          * Idempotency guard.
+          *
+          * In distributed or retry-prone environments,
+          * the same discard operation may be executed more than once.
+          *
+          * If the bag is already discarded, we do not create another replacement.
+          */
+         if (status == BagStatus.DISCARDED) {
+             return null;
+         }
+
          if (status == BagStatus.CLOSED) {
              throw new IllegalStateException("Cannot discard a CLOSED bag");
          }
 
-         if (status == BagStatus.DISCARDED) {
-            throw new IllegalStateException("Bag is already discarded");
-        }
-
         //Mark current bag as discarded
         this.status = BagStatus.DISCARDED;
 
-         //Create a new bag as a replacement (compensation)
+         //Create replacement bag (forward compensation action)
          Bag newBag = new Bag(this.id);
          newBag.status = BagStatus.REUSED;
 

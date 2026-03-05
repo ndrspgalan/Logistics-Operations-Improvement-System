@@ -36,6 +36,7 @@ OPEN --> CLOSED : normal completion
 
 OPEN --> DISCARDED : bag failure
 DISCARDED --> REUSED : replacement bag created
+REUSED --> CLOSED : compensated completion
 
 CLOSED --> EMPTY : unpack completed
 ```

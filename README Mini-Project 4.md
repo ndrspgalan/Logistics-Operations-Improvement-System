@@ -30,6 +30,29 @@ This eventually forces:
 
 In other words: the workaround is not free; it creates deferred operational debt.
 
+### Design Change
+
+Introduce a structured return-recovery flow with explicit operator decisions and strict inventory guardrails.
+
+Instead of forcing operators to reconstruct bag contents manually or rely on workarounds for inventory placement, the system uses the SLAM identifier as a manifest of the returned bag.
+The recovery process is modeled as a guided flow:
+1. Present the full bag manifest.
+2. Select quantities to remove from the bag.
+3. Confirm selection.
+4. Choose an explicit disposition for each line.
+5. Confirm and execute the disposition plan.
+
+The system enforces guardrails where operational ambiguity previously encouraged workarounds.
+Key examples include:
+- Automatic destruction for broken cold chains.
+- Eligibility checks for reintroducing ambient products.
+- Strict expiration-date matching for bin placement.
+
+These rules reduce incentives for unsafe practices such as expiration date manipulation, adjacent-bin
+placement or inventory corrections outside the system.
+
+Return recovery is therefore modeled as a first-class operational flow rather than an exception path.
+
 ### What this model change introduces:
 
 This mini-project models a return recovery flow that is:

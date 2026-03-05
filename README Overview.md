@@ -98,6 +98,31 @@ This repository explores a different approach:
 The goal is not to optimize local throughput,
 but to prevent invalid operational states from entering the system.
 
+## Design Principles
+
+The design choices in this repository follow a small set of guiding principles derived from real operational systems.
+
+**1. Operational constraints must exist in the domain model**
+
+Physical, temporal and operational limitations are represented as explicit domain rules
+instead of being handled by external procedures or manual workarounds.
+
+**2. Failures should become domain states, not hidden exceptions**
+
+Operational failures such as missed windows, unusable bags or return flows are modeled as explicit states that remain visible and traceable.
+
+**3. Prefer forward-only compensating flows**
+
+Instead of attempting to revert past operations, the system acknoledges failures and compensates forward while preserving traceability.
+
+**4. Deterministic policies over implicit assumptions**
+
+Critical constraints such as capacity limits or expiration rules are enforced through explicit policies rather than scattered validations.
+
+**5. Accept local inefficiency to gain systemic reliability**
+
+Some design decisions intentionally reduce local throughput in order to prevent larger operational failures downstream.
+
 ## Domain invariants
 
 The system enforces several invariants at construction time and during state transitions.

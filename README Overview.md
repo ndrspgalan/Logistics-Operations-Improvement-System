@@ -325,3 +325,11 @@ The repository explores domain modeling techniques for operational systems
 and reflects real-world observations from logistics environments.
 
 © 2026 Andrés Pérez Galán
+
+## Citation
+
+If referencing ideas from this repository, please cite:
+
+Pérez Galán, A. (2026).
+Logistics Operations Improvement System.
+GitHub repository.

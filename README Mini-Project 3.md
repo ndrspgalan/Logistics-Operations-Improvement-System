@@ -75,7 +75,7 @@ CHILLED / FROZEN (special inner bag + flexible outer bag):
   - There is no volume constraint related to folding/closing the bag.
   - There is a weight constraint: 15 kg (standard handling safety limit).
 - Ice has a real physical cost:
-  - Each block weighs 0.4 kg and occupies approximately 500 cm3.
+  - Each block weighs 0.4 kg and occupies approximately 400 cm3.
   - Ice adds both weight and volume to the bag contents.
 
 Ice amount depends on outside temperature:
@@ -93,7 +93,8 @@ Fragile product (all areas):
 - This serves two purposes:
   - For models worse packing efficiency (upright, protected, spaced).
   - Allows downstream systems (e. g. SLAM/labels) to mark the bag as FRAGILE.
-- This applies to: LIGHT_AMBIENT, CHILLED, FROZEN; in HARD_AMBIENT there is no bag, but the flag is still relevant as a warning.
+- This applies to: LIGHT_AMBIENT, CHILLED, FROZEN; in HARD_AMBIENT there is no bag, but the flag is still
+relevant as a warning.
 
 ### Trade-offs:
 

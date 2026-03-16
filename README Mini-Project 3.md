@@ -59,9 +59,12 @@ receive the SLAM label directly on the product.
 
 LIGHT_AMBIENT (cardboard bag):
 - Max weight: 12 kg (safety limit to avoid bag breakage during handling).
-- Operational volume limit for closing: 50.000 cm3.
-- Even if the theoretical bag volume is higher, the system validates against the operational closing limit.
-- Fragile products:
+- Physical bag capacity: 15.000 cm3 (~15 L).
+- Operational closing limit: 12.000cm3 (~12 L).
+
+Even if the theoretical bag volume is higher, the system validates against the operational closing limit.
+
+Fragile products:
   - Their volume is counted as volume * 1.20.
   - This models orientation constraints, gaps and "cannot be compressed" behavior.
 

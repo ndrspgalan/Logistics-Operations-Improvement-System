@@ -272,13 +272,43 @@ public class ScenarioRunner {
             metrics.recordCapacityAccepted();
         }
 
-        // Big load (x10)
-        List<Product> bigLoad = new java.util.ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            bigLoad.add(item);
+        // Near limit load (should still fit)
+        List<Product> nearLimitLoad = new java.util.ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            nearLimitLoad.add(item);
         }
 
-        boolean fitsBig = capacityPolicy.fits(BagType.LIGHT_AMBIENT, bigLoad, 20);
+        boolean fitsNearLimit = capacityPolicy.fits(
+                BagType.LIGHT_AMBIENT,
+                nearLimitLoad,
+                20
+        );
+
+        System.out.println("Near limit load fits: " + fitsNearLimit);
+
+        if (fitsNearLimit) {
+            metrics.recordCapacityAccepted();
+        }
+
+// Overflow load (should be rejected)
+        List<Product> overflowLoad = new java.util.ArrayList<>();
+        for (int i = 0; i < 13; i++) {
+            overflowLoad.add(item);
+        }
+
+        boolean fitsOverflow = capacityPolicy.fits(
+                BagType.LIGHT_AMBIENT,
+                overflowLoad,
+                20
+        );
+
+        if (!fitsOverflow) {
+            metrics.recordCapacityRejected();
+        }
+
+        System.out.println("Overflow load fits: " + fitsOverflow);
+
+        boolean fitsBig = capacityPolicy.fits(BagType.LIGHT_AMBIENT, nearLimitLoad, 20);
 
         if (!fitsBig) {
             metrics.recordCapacityRejected();

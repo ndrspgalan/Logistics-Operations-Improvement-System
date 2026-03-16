@@ -233,6 +233,10 @@ Capacity checks at scale
 
 Small load fits: true
 
+Near limit load fits: true
+
+Overflow load fits: false
+
 Big load fits: false
 
 At x10 scale, capacity evaluation becomes critical for planning throughput.
@@ -251,7 +255,7 @@ Compensation rate: 0.03 (3/100)
 
 Manual intervention rate: 0.42 (42/100)
 
-Simulation runtime: 28 ms
+Simulation runtime: 29 ms
 
 === Simulation Completed ===
 

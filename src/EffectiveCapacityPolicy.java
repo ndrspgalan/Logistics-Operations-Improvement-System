@@ -8,15 +8,15 @@ public class EffectiveCapacityPolicy implements CapacityPolicy {
     private static final double MAX_WEIGHT_COLD_KG = 15;            // chilled/frozen safety
 
     //Volume limits
-    private static final int MAX_VOLUME_CM3 = 60_000;
-    private static final int LIGHT_AMBIENT_OPERATIVE_VOLUME_CM3 = 50_000;
+    private static final int MAX_VOLUME_CM3 = 15_000;
+    private static final int LIGHT_AMBIENT_OPERATIVE_VOLUME_CM3 = 12_000;
 
     //Fragile penalty
     private static final double FRAGILE_VOLUME_MULTIPLIER = 1.20; // +20%
 
     //Ice assumptions
     private static final double ICE_BLOCK_WEIGHT_KG = 0.4; // 400G
-    private static final int ICE_BLOCK_VOLUME_CM3 = 500;   // rough approximation
+    private static final int ICE_BLOCK_VOLUME_CM3 = 400;   // rough approximation
 
     //Temperature range
     private static final double MIN_TEMP_C = 10.0;

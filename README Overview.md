@@ -315,3 +315,21 @@ This cost avoids:
 - Inventory desynchronization.
 - Expensive cycle counts.
 - Audit corrections.
+
+## Intellectual Ownership
+
+This project and its design ideas were developed independently by
+Andrés Pérez Galán as part of a personal research and portfolio initiative.
+
+The repository explores domain modeling techniques for operational systems
+and reflects real-world observations from logistics environments.
+
+© 2026 Andrés Pérez Galán
+
+## Citation
+
+If referencing ideas from this repository, please cite:
+
+Pérez Galán, A. (2026).
+Logistics Operations Improvement System.
+GitHub repository.
